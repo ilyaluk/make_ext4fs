@@ -59,3 +59,26 @@ void generate_uuid(const char *namespace, const char *name, u8 result[16])
 	uuid->clk_seq_hi_res &= ~(1 << 6);
 	uuid->clk_seq_hi_res |= 1 << 7;
 }
+
+void uuid_parse(const char *uuid_str, u8 result[16])
+{
+    int i, j;
+    for (i = 0, j = 0; i < 36; i++) {
+        if (uuid_str[i] == '-') continue;
+        if (j < 16) {
+            sscanf(&uuid_str[i], "%2hhx", &result[j]);
+            i++;
+            j++;
+        }
+    }
+}
+
+void uuid_to_str(const u8 uuid[16], char uuid_str[37])
+{
+    sprintf(uuid_str, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-"
+            "%02x%02x%02x%02x%02x%02x",
+            uuid[0], uuid[1], uuid[2], uuid[3],
+            uuid[4], uuid[5], uuid[6], uuid[7],
+            uuid[8], uuid[9], uuid[10], uuid[11],
+            uuid[12], uuid[13], uuid[14], uuid[15]);
+}

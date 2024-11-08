@@ -21,4 +21,8 @@
 
 void generate_uuid(const char *namespace, const char *name, u8 result[16]);
 
+void uuid_parse(const char *uuid_str, u8 result[16]);
+
+void uuid_to_str(const u8 uuid[16], char uuid_str[37]);
+
 #endif

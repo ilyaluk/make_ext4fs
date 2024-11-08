@@ -27,6 +27,7 @@
 
 #include "ext4_utils.h"
 #include "canned_fs_config.h"
+#include "uuid.h"
 
 extern struct fs_info info;
 
@@ -36,7 +37,7 @@ static void usage(char *path)
 	fprintf(stderr, "%s [ -l <len> ] [ -j <journal size> ] [ -b <block_size> ]\n", basename(path));
 	fprintf(stderr, "    [ -g <blocks per group> ] [ -i <inodes> ] [ -I <inode size> ]\n");
 	fprintf(stderr, "    [ -m <reserved blocks percent> ] [ -L <label> ] [ -f ]\n");
-	fprintf(stderr, "    [ -S file_contexts ] [ -C fs_config ] [ -T timestamp ]\n");
+	fprintf(stderr, "    [ -S file_contexts ] [ -C fs_config ] [ -T timestamp ] [ -U uuid ]\n");
 	fprintf(stderr, "    [ -z | -s ] [ -w ] [ -c ] [ -J ] [ -v ] [ -B <block_list_file> ]\n");
 	fprintf(stderr, "    <filename> [<directory>]\n");
 }
@@ -56,9 +57,11 @@ int main(int argc, char **argv)
 	int exitcode;
 	int verbose = 0;
 	time_t fixed_time = -1;
+	const u8* uuid = NULL;
+	u8 parsed_uuid[16];
 	FILE* block_list_file = NULL;
 
-	while ((opt = getopt(argc, argv, "l:j:b:g:i:I:L:T:C:B:m:fwzJsctv")) != -1) {
+	while ((opt = getopt(argc, argv, "l:j:b:g:i:I:L:T:U:C:B:m:fwzJsctv")) != -1) {
 		switch (opt) {
 		case 'l':
 			info.len = parse_num(optarg);
@@ -107,6 +110,10 @@ int main(int argc, char **argv)
 			break;
 		case 'T':
 			fixed_time = strtoll(optarg, NULL, 0);
+			break;
+		case 'U':
+			uuid_parse(optarg, parsed_uuid);
+			uuid = parsed_uuid;
 			break;
 		case 'C':
 			fs_config_file = optarg;
@@ -175,7 +182,7 @@ int main(int argc, char **argv)
 	}
 
 	exitcode = make_ext4fs_internal(fd, directory, fs_config_func, gzip,
-		sparse, crc, wipe, verbose, fixed_time, block_list_file);
+		sparse, crc, wipe, verbose, fixed_time, uuid, block_list_file);
 	close(fd);
 	if (block_list_file)
 		fclose(block_list_file);

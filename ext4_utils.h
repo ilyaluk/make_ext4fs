@@ -155,6 +155,7 @@ int make_ext4fs_internal(int fd, const char *directory,
 						 fs_config_func_t fs_config_func, int gzip,
 						 int sparse, int crc, int wipe,
 						 int verbose, time_t fixed_time,
+						 const u8 *uuid,
 						 FILE* block_list_file);
 
 int read_ext(int fd, int verbose);

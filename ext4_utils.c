@@ -15,7 +15,6 @@
  */
 
 #include "ext4_utils.h"
-#include "uuid.h"
 #include "allocate.h"
 #include "indirect.h"
 #include "extent.h"
@@ -221,7 +220,7 @@ void ext4_fill_in_sb()
 	sb->s_feature_compat = info.feat_compat;
 	sb->s_feature_incompat = info.feat_incompat;
 	sb->s_feature_ro_compat = info.feat_ro_compat;
-	generate_uuid("extandroid/make_ext4fs", info.label, sb->s_uuid);
+	memcpy(sb->s_uuid, info.uuid, sizeof(sb->s_uuid));
 	memset(sb->s_volume_name, 0, sizeof(sb->s_volume_name));
 	strncpy(sb->s_volume_name, info.label, sizeof(sb->s_volume_name));
 	memset(sb->s_last_mounted, 0, sizeof(sb->s_last_mounted));

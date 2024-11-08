@@ -379,6 +379,7 @@ int make_ext4fs_internal(int fd, const char *_directory,
 						 fs_config_func_t fs_config_func, int gzip,
 						 int sparse, int crc, int wipe,
 						 int verbose, time_t fixed_time,
+						 const u8* uuid,
 						 FILE* block_list_file)
 {
 	u32 root_inode_num;
@@ -443,6 +444,14 @@ int make_ext4fs_internal(int fd, const char *_directory,
 
 	info.bg_desc_reserve_blocks = compute_bg_desc_reserve_blocks();
 
+	if (uuid != NULL) {
+		info.uuid = uuid;
+	} else {
+		u8 new_uuid[16];
+		generate_uuid("extandroid/make_ext4fs", info.label, new_uuid);
+		info.uuid = new_uuid;
+	}
+
 	printf("Creating filesystem with parameters:\n");
 	printf("    Size: %"PRIu64"\n", info.len);
 	printf("    Block size: %d\n", info.block_size);
@@ -451,6 +460,10 @@ int make_ext4fs_internal(int fd, const char *_directory,
 	printf("    Inode size: %d\n", info.inode_size);
 	printf("    Journal blocks: %d\n", info.journal_blocks);
 	printf("    Label: %s\n", info.label);
+
+	char uuid_str[37];
+	uuid_to_str(info.uuid, uuid_str);
+	printf("    UUID: %s\n", uuid_str);
 
 	ext4_create_fs_aux_info();
 
